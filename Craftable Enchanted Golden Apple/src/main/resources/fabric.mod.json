@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "craftable_enchanted_golden_apple",
+  "version": "${version}",
+
+  "name": "Craftable Enchanted Golden Apple",
+  "description": "This brings back the Enchanted Golden Apple crafting recipe from 1.8!",
+  "authors": [
+    "SmushyTaco"
+  ],
+  "contact": {
+    "homepage": "https://www.smushytaco.com/"
+  },
+
+  "license": "GNU Lesser General Public License version 3 (LGPLv3)",
+  "icon": "assets/craftable_enchanted_golden_apple/icon.png",
+
+  "environment": "*",
+
+  "depends": {
+    "fabricloader": ">=0.4.8",
+    "fabric": "*"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}
