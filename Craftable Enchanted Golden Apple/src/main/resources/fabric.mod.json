@@ -9,6 +9,7 @@
   ],
   "contact": {
     "homepage": "https://www.smushytaco.com/",
+    "issues": "https://www.curseforge.com/minecraft/mc-mods/fabric-craftable-enchanted-golden-apple/issues/",
     "sources": "https://github.com/realSmushyTaco/Craftable-Enchanted-Golden-Apple/"
   },
   "license": "GNU Lesser General Public License version 3 (LGPLv3)",
@@ -18,8 +19,5 @@
     "fabricloader": ">=0.11.3",
     "fabric": "*",
     "minecraft": "1.16.x"
-  },
-  "suggests": {
-    "flamingo": "*"
   }
 }
