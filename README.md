@@ -1,2 +1,4 @@
 # Craftable Enchanted Golden Apple
-Mod information: https://www.curseforge.com/minecraft/mc-mods/fabric-craftable-enchanted-golden-apple
+CurseForge: https://www.curseforge.com/minecraft/mc-mods/fabric-craftable-enchanted-golden-apple/
+
+Modrinth: https://modrinth.com/mod/craftable-enchanted-golden-apple/
