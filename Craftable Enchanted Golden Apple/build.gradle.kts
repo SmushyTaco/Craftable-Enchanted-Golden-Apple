@@ -1,9 +1,7 @@
-plugins {
-	id("fabric-loom")
-}
+plugins { id("fabric-loom") }
 base {
-	val archivesBaseNameTwo: String by project
-	archivesBaseName = archivesBaseNameTwo
+	val archivesBaseName: String by project
+	archivesName.set(archivesBaseName)
 }
 val modVersion: String by project
 version = modVersion
@@ -22,28 +20,20 @@ dependencies {
 	modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
 }
 tasks {
-	val javaVersion = JavaVersion.VERSION_16
+	val javaVersion = JavaVersion.VERSION_17
 	withType<JavaCompile> {
 		options.encoding = "UTF-8"
 		sourceCompatibility = javaVersion.toString()
 		targetCompatibility = javaVersion.toString()
 		options.release.set(javaVersion.toString().toInt())
 	}
-	jar {
-		from("LICENSE") {
-			rename { "${it}_${base.archivesBaseName}" }
-		}
-	}
+	jar { from("LICENSE") { rename { "${it}_${base.archivesName}" } } }
 	processResources {
 		inputs.property("version", project.version)
-		filesMatching("fabric.mod.json") {
-			expand(mutableMapOf("version" to project.version))
-		}
+		filesMatching("fabric.mod.json") { expand(mutableMapOf("version" to project.version)) }
 	}
 	java {
-		toolchain {
-			languageVersion.set(JavaLanguageVersion.of(javaVersion.toString()))
-		}
+		toolchain { languageVersion.set(JavaLanguageVersion.of(javaVersion.toString())) }
 		sourceCompatibility = javaVersion
 		targetCompatibility = javaVersion
 		withSourcesJar()
