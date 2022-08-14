@@ -16,9 +16,9 @@
   "icon": "assets/craftable_enchanted_golden_apple/icon.png",
   "environment": "*",
   "depends": {
-    "fabricloader": ">=0.12.12",
-    "fabric": "*",
-    "minecraft": "1.18.x",
+    "fabricloader": ">=0.14.9",
+    "fabric-api": "*",
+    "minecraft": "~1.19",
     "java": ">=17"
   }
 }
