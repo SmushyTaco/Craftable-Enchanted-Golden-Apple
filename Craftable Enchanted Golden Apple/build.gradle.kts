@@ -7,17 +7,16 @@ val modVersion: String by project
 version = modVersion
 val mavenGroup: String by project
 group = mavenGroup
-minecraft {}
 repositories {}
 dependencies {
 	val minecraftVersion: String by project
-	minecraft("com.mojang:minecraft:$minecraftVersion")
+	minecraft("com.mojang", "minecraft", minecraftVersion)
 	val yarnMappings: String by project
-	mappings("net.fabricmc:yarn:$yarnMappings:v2")
+	mappings("net.fabricmc", "yarn", yarnMappings, null, "v2")
 	val loaderVersion: String by project
-	modImplementation("net.fabricmc:fabric-loader:$loaderVersion")
+	modImplementation("net.fabricmc", "fabric-loader", loaderVersion)
 	val fabricVersion: String by project
-	modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
+	modImplementation("net.fabricmc.fabric-api", "fabric-api", fabricVersion)
 }
 tasks {
 	val javaVersion = JavaVersion.VERSION_17
