@@ -1,35 +1,26 @@
 plugins { id("fabric-loom") }
-base {
-	val archivesBaseName: String by project
-	archivesName.set(archivesBaseName)
-}
-val modVersion: String by project
-version = modVersion
-val mavenGroup: String by project
-group = mavenGroup
+base { archivesName.set(project.extra["archives_base_name"] as String) }
+version = project.extra["mod_version"] as String
+group = project.extra["maven_group"] as String
 repositories {}
 dependencies {
-	val minecraftVersion: String by project
-	minecraft("com.mojang", "minecraft", minecraftVersion)
-	val yarnMappings: String by project
-	mappings("net.fabricmc", "yarn", yarnMappings, null, "v2")
-	val loaderVersion: String by project
-	modImplementation("net.fabricmc", "fabric-loader", loaderVersion)
-	val fabricVersion: String by project
-	modImplementation("net.fabricmc.fabric-api", "fabric-api", fabricVersion)
+	minecraft("com.mojang", "minecraft", project.extra["minecraft_version"] as String)
+	mappings("net.fabricmc", "yarn", project.extra["yarn_mappings"] as String, null, "v2")
+	modImplementation("net.fabricmc", "fabric-loader", project.extra["loader_version"] as String)
+	modImplementation("net.fabricmc.fabric-api", "fabric-api", project.extra["fabric_version"] as String)
 }
 tasks {
-	val javaVersion = JavaVersion.VERSION_17
+	val javaVersion = JavaVersion.toVersion((project.extra["java_version"] as String).toInt())
 	withType<JavaCompile> {
 		options.encoding = "UTF-8"
 		sourceCompatibility = javaVersion.toString()
 		targetCompatibility = javaVersion.toString()
 		options.release.set(javaVersion.toString().toInt())
 	}
-	jar { from("LICENSE") { rename { "${it}_${base.archivesName}" } } }
+	jar { from("LICENSE") { rename { "${it}_${base.archivesName.get()}" } } }
 	processResources {
-		inputs.property("version", project.version)
-		filesMatching("fabric.mod.json") { expand(mutableMapOf("version" to project.version)) }
+		filesMatching("fabric.mod.json") { expand(mutableMapOf("version" to project.extra["mod_version"] as String, "fabricloader" to project.extra["loader_version"] as String, "fabric_api" to project.extra["fabric_version"] as String, "minecraft" to project.extra["minecraft_version"] as String, "java" to project.extra["java_version"] as String)) }
+		filesMatching("*.mixins.json") { expand(mutableMapOf("java" to project.extra["java_version"] as String)) }
 	}
 	java {
 		toolchain { languageVersion.set(JavaLanguageVersion.of(javaVersion.toString())) }
