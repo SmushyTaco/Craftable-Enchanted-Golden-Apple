@@ -1,8 +1,7 @@
 plugins { id("fabric-loom") }
-base { archivesName.set(project.extra["archives_base_name"] as String) }
+base.archivesName = project.extra["archives_base_name"] as String
 version = project.extra["mod_version"] as String
 group = project.extra["maven_group"] as String
-repositories {}
 dependencies {
 	minecraft("com.mojang", "minecraft", project.extra["minecraft_version"] as String)
 	mappings("net.fabricmc", "yarn", project.extra["yarn_mappings"] as String, null, "v2")
@@ -11,19 +10,22 @@ dependencies {
 }
 tasks {
 	val javaVersion = JavaVersion.toVersion((project.extra["java_version"] as String).toInt())
-	withType<JavaCompile> {
+	withType<JavaCompile>().configureEach {
 		options.encoding = "UTF-8"
 		sourceCompatibility = javaVersion.toString()
 		targetCompatibility = javaVersion.toString()
-		options.release.set(javaVersion.toString().toInt())
+		options.release = javaVersion.toString().toInt()
 	}
+	withType<JavaExec>().configureEach { defaultCharacterEncoding = "UTF-8" }
+	withType<Javadoc>().configureEach { options.encoding = "UTF-8" }
+	withType<Test>().configureEach { defaultCharacterEncoding = "UTF-8" }
 	jar { from("LICENSE") { rename { "${it}_${base.archivesName.get()}" } } }
 	processResources {
 		filesMatching("fabric.mod.json") { expand(mutableMapOf("version" to project.extra["mod_version"] as String, "fabricloader" to project.extra["loader_version"] as String, "fabric_api" to project.extra["fabric_version"] as String, "minecraft" to project.extra["minecraft_version"] as String, "java" to project.extra["java_version"] as String)) }
 		filesMatching("*.mixins.json") { expand(mutableMapOf("java" to project.extra["java_version"] as String)) }
 	}
 	java {
-		toolchain { languageVersion.set(JavaLanguageVersion.of(javaVersion.toString())) }
+		toolchain { languageVersion = JavaLanguageVersion.of(javaVersion.toString()) }
 		sourceCompatibility = javaVersion
 		targetCompatibility = javaVersion
 		withSourcesJar()
