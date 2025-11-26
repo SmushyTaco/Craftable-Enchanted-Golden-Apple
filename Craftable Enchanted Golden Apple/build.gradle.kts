@@ -1,54 +1,67 @@
 import net.darkhax.curseforgegradle.TaskPublishCurseForge
 plugins {
-    id("fabric-loom")
-    id("com.modrinth.minotaur")
-    id("net.darkhax.curseforgegradle")
-    id("co.uzzu.dotenv.gradle")
+    alias(libs.plugins.loom)
+    alias(libs.plugins.minotaur)
+    alias(libs.plugins.curseForgeGradle)
+    alias(libs.plugins.dotenv)
 }
 val archivesBaseName = providers.gradleProperty("archives_base_name")
 val modVersion = providers.gradleProperty("mod_version")
 val mavenGroup = providers.gradleProperty("maven_group")
-val minecraftVersion = providers.gradleProperty("minecraft_version")
-val yarnMappings = providers.gradleProperty("yarn_mappings")
-val loaderVersion = providers.gradleProperty("loader_version")
-val fabricVersion = providers.gradleProperty("fabric_version")
-val javaVersion = providers.gradleProperty("java_version")
-base.archivesName = archivesBaseName.get()
+
+val javaVersion = libs.versions.java.map { it.toInt() }
+
+base.archivesName = archivesBaseName
 version = modVersion.get()
 group = mavenGroup.get()
 dependencies {
-    minecraft("com.mojang:minecraft:${minecraftVersion.get()}")
-    mappings("net.fabricmc:yarn:${yarnMappings.get()}:v2")
-    modImplementation("net.fabricmc:fabric-loader:${loaderVersion.get()}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${fabricVersion.get()}")
+    minecraft(libs.minecraft)
+    mappings(variantOf(libs.yarnMappings) { classifier("v2") })
+    modImplementation(libs.loader)
+    modImplementation(libs.fabric.api)
+}
+java {
+    toolchain {
+        languageVersion = javaVersion.map { JavaLanguageVersion.of(it) }
+        vendor = JvmVendorSpec.ADOPTIUM
+    }
+    sourceCompatibility = JavaVersion.toVersion(javaVersion.get())
+    targetCompatibility = JavaVersion.toVersion(javaVersion.get())
+    withSourcesJar()
+}
+val licenseFile = run {
+    val rootLicense = layout.projectDirectory.file("LICENSE")
+    val parentLicense = layout.projectDirectory.file("../LICENSE")
+    when {
+        rootLicense.asFile.exists() -> {
+            logger.lifecycle("Using LICENSE from project root: {}", rootLicense.asFile)
+            rootLicense
+        }
+        parentLicense.asFile.exists() -> {
+            logger.lifecycle("Using LICENSE from parent directory: {}", parentLicense.asFile)
+            parentLicense
+        }
+        else -> {
+            logger.warn("No LICENSE file found in project or parent directory.")
+            null
+        }
+    }
 }
 tasks {
     withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
-        sourceCompatibility = javaVersion.get()
-        targetCompatibility = javaVersion.get()
-        options.release = javaVersion.get().toInt()
+        sourceCompatibility = javaVersion.get().toString()
+        targetCompatibility = javaVersion.get().toString()
+        if (javaVersion.get() > 8) options.release = javaVersion
+    }
+    named<UpdateDaemonJvm>("updateDaemonJvm") {
+        languageVersion = libs.versions.gradleJava.map { JavaLanguageVersion.of(it.toInt()) }
+        vendor = JvmVendorSpec.ADOPTIUM
     }
     withType<JavaExec>().configureEach { defaultCharacterEncoding = "UTF-8" }
     withType<Javadoc>().configureEach { options.encoding = "UTF-8" }
     withType<Test>().configureEach { defaultCharacterEncoding = "UTF-8" }
-    named<Jar>("jar") {
-        val rootLicense = layout.projectDirectory.file("LICENSE")
-        val parentLicense = layout.projectDirectory.file("../LICENSE")
-        val licenseFile = when {
-            rootLicense.asFile.exists() -> {
-                logger.lifecycle("Using LICENSE from project root: ${rootLicense.asFile}")
-                rootLicense
-            }
-            parentLicense.asFile.exists() -> {
-                logger.lifecycle("Using LICENSE from parent directory: ${parentLicense.asFile}")
-                parentLicense
-            }
-            else -> {
-                logger.warn("No LICENSE file found in project or parent directory.")
-                null
-            }
-        }
+    withType<Jar>().configureEach {
         licenseFile?.let {
             from(it) {
                 rename { original -> "${original}_${archiveBaseName.get()}" }
@@ -57,10 +70,10 @@ tasks {
     }
     processResources {
         val stringModVersion = modVersion.get()
-        val stringLoaderVersion = loaderVersion.get()
-        val stringFabricVersion = fabricVersion.get()
-        val stringMinecraftVersion = minecraftVersion.get()
-        val stringJavaVersion = javaVersion.get()
+        val stringLoaderVersion = libs.versions.loader.get()
+        val stringFabricVersion = libs.versions.fabric.api.get()
+        val stringMinecraftVersion = libs.versions.minecraft.get()
+        val stringJavaVersion = libs.versions.java.get()
         inputs.property("modVersion", stringModVersion)
         inputs.property("loaderVersion", stringLoaderVersion)
         inputs.property("fabricVersion", stringFabricVersion)
@@ -78,29 +91,24 @@ tasks {
             )
         }
     }
-    java {
-        toolchain.languageVersion = JavaLanguageVersion.of(javaVersion.get())
-        sourceCompatibility = JavaVersion.toVersion(javaVersion.get().toInt())
-        targetCompatibility = JavaVersion.toVersion(javaVersion.get().toInt())
-        withSourcesJar()
-    }
     register<TaskPublishCurseForge>("publishCurseForge") {
+        group = "publishing"
         disableVersionDetection()
         apiToken = env.fetch("CURSEFORGE_TOKEN", "")
         val file = upload(335918, remapJar)
-        file.displayName = "[${minecraftVersion.get()}] Craftable Enchanted Golden Apple"
+        file.displayName = "[${libs.versions.minecraft.get()}] Craftable Enchanted Golden Apple"
         file.addEnvironment("Client", "Server")
         file.changelog = ""
         file.releaseType = "release"
         file.addModLoader("Fabric")
-        file.addGameVersion(minecraftVersion.get())
+        file.addGameVersion(libs.versions.minecraft.get())
     }
 }
 modrinth {
-    token.set(env.fetch("MODRINTH_TOKEN", ""))
-    projectId.set("craftable-enchanted-golden-apple")
+    token = env.fetch("MODRINTH_TOKEN", "")
+    projectId = "craftable-enchanted-golden-apple"
     uploadFile.set(tasks.remapJar)
-    gameVersions.addAll(minecraftVersion.get())
-    versionName.set("[${minecraftVersion.get()}] Craftable Enchanted Golden Apple")
+    gameVersions.add(libs.versions.minecraft)
+    versionName = libs.versions.minecraft.map { "[$it] Craftable Enchanted Golden Apple" }
     dependencies { required.project("fabric-api") }
 }
