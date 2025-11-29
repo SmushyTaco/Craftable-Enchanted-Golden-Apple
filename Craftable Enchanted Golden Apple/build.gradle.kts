@@ -78,7 +78,6 @@ tasks {
         )
         inputs.properties(resourceMap)
         filesMatching("fabric.mod.json") { expand(resourceMap) }
-        filesMatching("**/*.mixins.json") { expand(resourceMap.filterKeys { it == "java" }) }
     }
     register<TaskPublishCurseForge>("publishCurseForge") {
         group = "publishing"
