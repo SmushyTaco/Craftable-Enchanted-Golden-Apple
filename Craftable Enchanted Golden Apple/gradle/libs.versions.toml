@@ -2,7 +2,7 @@
 ##########################################################################
 # Plugins
 # Check this on https://github.com/FabricMC/fabric-loom/releases/latest/
-loom = "1.13-SNAPSHOT"
+loom = "1.14-SNAPSHOT"
 # Check this on https://plugins.gradle.org/plugin/com.modrinth.minotaur/
 minotaur = "2.8.10"
 # Check this on https://plugins.gradle.org/plugin/net.darkhax.curseforgegradle/
@@ -19,9 +19,9 @@ gradleJava = "21"
 # Dependencies
 minecraft = "1.21.10"
 # Check this on https://github.com/FabricMC/fabric-loader/releases/latest
-loader = "0.18.1"
+loader = "0.18.4"
 # Check this on https://modrinth.com/mod/fabric-api/versions/
-fabric-api = "0.138.3+1.21.10"
+fabric-api = "0.138.4+1.21.10"
 ##########################################################################
 
 [libraries]
@@ -30,7 +30,7 @@ loader = { group = "net.fabricmc", name = "fabric-loader", version.ref = "loader
 fabric-api = { group = "net.fabricmc.fabric-api", name = "fabric-api", version.ref = "fabric-api" }
 
 [plugins]
-loom = { id = "fabric-loom", version.ref = "loom" }
+loom = { id = "net.fabricmc.fabric-loom-remap", version.ref = "loom" }
 minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
 curseForgeGradle = { id = "net.darkhax.curseforgegradle", version.ref = "curseForgeGradle" }
 dotenv = { id = "co.uzzu.dotenv.gradle", version.ref = "dotenv" }
