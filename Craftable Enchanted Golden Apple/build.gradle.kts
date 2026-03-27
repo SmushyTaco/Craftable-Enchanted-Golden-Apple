@@ -16,9 +16,8 @@ version = modVersion.get()
 group = mavenGroup.get()
 dependencies {
     minecraft(libs.minecraft)
-    mappings(loom.officialMojangMappings())
-    modImplementation(libs.loader)
-    modImplementation(libs.fabric.api)
+    implementation(libs.loader)
+    implementation(libs.fabric.api)
 }
 java {
     toolchain {
@@ -83,7 +82,7 @@ tasks {
         group = "publishing"
         disableVersionDetection()
         apiToken = env.fetch("CURSEFORGE_TOKEN", "")
-        val file = upload(335918, remapJar)
+        val file = upload(335918, jar)
         file.displayName = "[${libs.versions.minecraft.get()}] Craftable Enchanted Golden Apple"
         file.addEnvironment("Client", "Server")
         file.changelog = ""
@@ -95,7 +94,7 @@ tasks {
 modrinth {
     token = env.fetch("MODRINTH_TOKEN", "")
     projectId = "craftable-enchanted-golden-apple"
-    uploadFile.set(tasks.remapJar)
+    uploadFile.set(tasks.jar)
     gameVersions.add(libs.versions.minecraft)
     versionName = libs.versions.minecraft.map { "[$it] Craftable Enchanted Golden Apple" }
     dependencies { required.project("fabric-api") }
