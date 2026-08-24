@@ -58,9 +58,9 @@ loom {
                 }
             register("clientAuth") {
                 inherit(getByName("client"))
-                configName = "Minecraft Client (Auth)"
+                displayName = "Minecraft Client (Auth)"
                 val acc = account.get()
-                programArgs("--username", acc.profile.name, "--uuid", acc.profile.id, "--accessToken", acc.ygg.token)
+                programArguments.addAll("--username", acc.profile.name, "--uuid", acc.profile.id, "--accessToken", acc.ygg.token)
             }
         }
     }
@@ -131,9 +131,10 @@ tasks {
         filesMatching("fabric.mod.json") { expand(resourceMap) }
     }
     register<TaskPublishCurseForge>("publishCurseForge") {
+        description = "Publish to CurseForge."
         group = "publishing"
         disableVersionDetection()
-        apiToken = env.fetch("CURSEFORGE_TOKEN", "")
+        apiToken = env.fetch("CURSEFORGE_TOKEN").getOrElse("")
         val file = upload(335918, jar)
         file.displayName = "[${libs.versions.minecraft.get()}] Craftable Enchanted Golden Apple"
         file.addEnvironment("Client", "Server")
@@ -144,7 +145,7 @@ tasks {
     }
 }
 modrinth {
-    token = env.fetch("MODRINTH_TOKEN", "")
+    token = env.fetch("MODRINTH_TOKEN").orElse("")
     projectId = "craftable-enchanted-golden-apple"
     uploadFile.set(tasks.jar)
     gameVersions.add(libs.versions.minecraft)
